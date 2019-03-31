@@ -1,3 +1,5 @@
+// https://forum.processing.org/two/discussion/21046/panorama-using-a-webcam
+
 import boofcv.processing.*;
 import boofcv.struct.image.*;
 import boofcv.struct.feature.*;
@@ -10,28 +12,26 @@ Capture video;
 PImage prevFrame;
 PImage current;
  
-int leu = 0;
+int read = 0;
 int c = 1;
 float avgX = 0;
 float avgY = 0;
-boolean leitura1 = false;
-float armazena1 = 0;
- 
+boolean reading1 = false;
+float stores1 = 0;
  
 List<Point2D_F64> locations0, locations1;      // feature locations
 List<AssociatedIndex> matches;      // which features are matched together
  
- 
 void setup() {
- 
-  size(1600, 800);
+  size(1600, 800, P2D);
   video = new Capture(this, 1024, 768);
   video.start();
  
   prevFrame = createImage(624, 668, RGB);
   current = createImage(624, 668, RGB);
 }
-void detectar() {
+
+void detect() {
   SimpleDetectDescribePoint ddp = Boof.detectSurf(true, ImageDataType.F32);  //usar SURF
   SimpleAssociateDescription assoc = Boof.associateGreedy(ddp, true);  // busca interminavel
  
@@ -50,59 +50,57 @@ void detectar() {
 }
  
 void draw() {
-  detectar();
+  detect();
   int count = 0;
-  for ( AssociatedIndex i : matches  ) {     
-    if ( count++ % 30 != 0 )
+  for (AssociatedIndex i : matches) {     
+    if (count++ % 30 != 0) {
       continue;
-    else if ( count > 700)
-    {       
+    } else if (count > 700) {       
       break;
     }
+    
     Point2D_F64 p0 = locations0.get(i.src); 
     Point2D_F64 p1 = locations1.get(i.dst); 
-    float diferencaX = (float) p1.x - (float)p0.x;
-    float diferencaY = (float) p1.y - (float)p0.y;    
+    float diffX = (float) p1.x - (float)p0.x;
+    float diffY = (float) p1.y - (float)p0.y;    
  
-    if (leu < 20) {
- 
-      if (diferencaY < 15) {
-        avgX = avgX + (diferencaX - avgX)/c;
-        avgY = avgY + (diferencaY - avgY)/c;
-        //image(prevFrame,0,0);
-        //image(current,320,0);
+    if (read < 20) {
+      if (diffY < 15) {
+        avgX = avgX + (diffX - avgX)/c;
+        avgY = avgY + (diffY - avgY)/c;
+        image(prevFrame,0,0);
+        image(current,320,0);
         c++;
       }
     }
  
-    if ( leu == 19) {    
-      translacao();
+    if ( read == 19) {    
+      translation();
     }
-    leu++;
+    
+    read++;
   }
 }
  
- 
-void translacao() {
+void translation() {
   if (abs(avgX) > 20) {
-    armazena1 = armazena1 - avgX;
-    image( current, 640+armazena1, 180);
+    stores1 = stores1 - avgX;
+    image( current, 640+stores1, 180);
     prevFrame.copy(video, 200, 300, 824, 368, 0, 0, 320, 240);
   }
  
   println(avgX);
   c=1;
-  leu = 0;
+  read = 0;
   avgX = avgY = 0;
 }
  
 void captureEvent(Capture video) {
- 
   video.read();
   current.copy(video, 200, 300, 824, 368, 0, 0, 320, 240);
  
-  if ( leitura1 == false) {
+  if (reading1 == false) {
     prevFrame.copy(video, 200, 300, 824, 368, 0, 0, 320, 240); 
-    leitura1 = true;
+    reading1 = true;
   }
 }
