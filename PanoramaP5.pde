@@ -11,12 +11,12 @@ PImage currentFrame;
 PImage bufferImg;
 PGraphics finalGfx;
 boolean firstRun = true;
-int w = 320;
-int h = 240;
+int w = 160;
+int h = 120;
 String cam = "HD Pro Webcam C920";
-int alpha = 63;
+int alpha = 200;
 boolean debug = true;
-float strokeWeightNum = 4;
+float strokeWeightNum = 2;
 float maxDist = 50;
 
 List<Point2D_F64> locations0, locations1;      // feature locations
