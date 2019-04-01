@@ -13,8 +13,8 @@ PGraphics finalGfx;
 boolean firstRun = true;
 int w = 320;
 int h = 240;
-int cam = 95; // 16;
-int alpha = 127;
+String cam = "HD Pro Webcam C920";
+int alpha = 63;
 boolean debug = true;
 float strokeWeightNum = 4;
 float maxDist = 50;
@@ -25,8 +25,8 @@ List<AssociatedIndex> matches;      // which features are matched together
 void setup() {
   size(960, 720, P2D);
   
-  setupWebcam(w, h, cam);
-  
+  setupWebcam(w, h, cam, 30);
+ 
   prevFrame = createImage(video.width, video.height, RGB);
   prevFrame.loadPixels();
   currentFrame = createImage(video.width, video.height, RGB);
@@ -76,7 +76,6 @@ void detect() {
   assoc.associate(descs0, descs1);
   matches = assoc.getMatches();
   
-  float longestDist = 0;
   finalGfx.beginDraw();
   finalGfx.beginShape(LINES);
   for (AssociatedIndex i : matches) {       
@@ -108,9 +107,7 @@ void detect() {
   finalGfx.endShape();
   
   finalGfx.tint(255,alpha/2);
-  finalGfx.image(bufferImg, 0, 0);
+  finalGfx.image(bufferImg, -6, 0);
   finalGfx.noTint();
-    
   finalGfx.endDraw();
-  println(longestDist);
 }
